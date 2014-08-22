@@ -17,6 +17,7 @@ class QiubaiCrawler(object):
 		self.page = 1
 		self.pages = []
 		self.enable = False
+		self.display = 'l'
 
 	def get_page_content(self, page):
 		url = "http://www.qiushibaike.com/8hr/page/" + str(page)
@@ -41,7 +42,6 @@ class QiubaiCrawler(object):
 	def load_page(self):
 		while self.enable:
 			if len(self.pages) < 2:
-				print len(self.pages)
 				try:
 					content_list = self.get_page_content(str(self.page))
 					self.page += 1
@@ -52,16 +52,31 @@ class QiubaiCrawler(object):
 				time.sleep(1)
 
 	def show_page(self, now_page, page):
-		for items in now_page:
-			print 'No.%d' % page, items[0], items[1]
+		if self.display == 'l':
+			print 'press \'q\' to quit, and press \'enter\' to continue.'
+			print 'Page %d' % page
+			for items in now_page:
+				print items[0], items[1]
+				quit_input = raw_input()
+				if quit_input == 'q':
+					self.enable = False
+					break
+		else:
+			print 'Page %d' % page
+			for items in now_page:
+				print items[0], items[1]
+			print 'press \'q\' to quit, and press \'enter\' to continue.'
 			quit_input = raw_input()
 			if quit_input == 'q':
 				self.enable = False
-				break
+		
 
 	def start(self):
 		self.enable = True
 		page = self.page
+
+		display_input = raw_input('Line-by-line dispaly (L) or Page display (P):')
+		self.display = display_input.lower()
 
 		print 'loding...'
 		thread.start_new_thread(self.load_page, ())
