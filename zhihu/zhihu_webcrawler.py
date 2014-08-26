@@ -21,15 +21,16 @@ class ZhihuCrawler(object):
 		response = urllib2.urlopen(request)
 		page_content = response.read()
 
-		#print page_content
-
 		#set code to unicode
 		page_content_unicode = page_content.decode('utf-8')
-		items = re.findall('<div class=".*?zm-editable-content clearfix">(.*?)</div>',
+
+		items = re.findall('<a data-tip=".*?" href="/people/.*?">(.*?)</a>.*?class="zu-question-my-bio">(.*?)</strong>.*?<div class=".*?zm-editable-content clearfix">(.*?)</div>.*?<a class="answer-date-link.*?>(.*?)</a>',
 			page_content_unicode, re.S)
 		return items
 
 zu = ZhihuCrawler()
-content = zu.get_answer(24984198)
+content = zu.get_answer(24997123)
 for c in content:
-	print c
+	print c[0] + '----' + c[1] + ':'
+	print c[2].lstrip().rstrip() + '----' + c[3]
+	print 
