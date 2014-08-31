@@ -6,7 +6,7 @@ __author__ = 'Ellery Zhang'
 Tumblr web crawler advanced version.
 '''
 
-import urllib2
+import urllib
 import re
 
 class TumblrCrawler(object):
@@ -15,20 +15,18 @@ class TumblrCrawler(object):
 		self.tumblr_url = url
 
 	def getImage(self):
-		tumblr_request = urllib2.Request(self.tumblr_url)
-		tumblr_response = urllib2.urlopen(tumblr_request)
-		tumblr_page = tumblr_response.read()
-		#print tumblr_page
+		tumblr_page = urllib.urlopen(self.tumblr_url).read()
 		imageList = []
-		image_match = re.search(r'<div class="box animate">.*?<img src="(.*?)".*?</header', tumblr_page, re.X)
-		if image_match:
-			imageList = image_match.group(1)
+		regex = r'<img src="(.*?)".*?>'
+		image_reg = re.compile(regex)
+		imageList = image_reg.findall(tumblr_page)
 		x = 0
 		print len(imageList)
-		print imageList
+		#print imageList
 		for imageurl in imageList:
 			if x < 10:
 				print imageurl
+				urllib.urlretrieve(imageurl,'%s.jpg' % x)
 				x += 1
 
 tum = TumblrCrawler('http://cutelygirls.tumblr.com/')
