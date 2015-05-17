@@ -8,8 +8,8 @@ Gounellei WebCrawler is a simple tool to download images or text content.
 
 * To download [`Zhihu`](http://www.zhihu.com/) content.
 * To download [`QiuShiBaiKe`](http://www.qiushibaike.com/) images and text content.
-* To download ['Tieba'](http://tieba.baidu.com/) content.
-* To download ['Tumblr'](https://www.tumblr.com/) images.
+* To download [`Tieba`](http://tieba.baidu.com/) content.
+* To download [`Tumblr`](https://www.tumblr.com/) images.
 
 ## Contributing
 
