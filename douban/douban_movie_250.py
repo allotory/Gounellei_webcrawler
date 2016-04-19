@@ -9,7 +9,7 @@ def download_page(url):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36'
     }
-    data = requests.get(url).content
+    data = requests.get(url, headers=headers).content
     return data
 
 def parse_html(html):
@@ -32,11 +32,14 @@ def parse_html(html):
 
 def main():
     url = DOWNLOAD_URL
-    while url:
-        html = download_page(url)
-        movie_name_list, url = parse_html(html)
-        print(movie_name_list)
-        print('-------------')
+    with open('movie.txt', 'a') as f:
+        while url:
+            html = download_page(url)
+            movie_name_list, url = parse_html(html)
+            for movie in movie_name_list:
+                f.write(movie + '\r\n')
+            print(movie_name_list)
+            print('-------------')
 
 if __name__ == '__main__':
     main()
