@@ -22,6 +22,15 @@ def login(username, password, oncaptcha) :
     captcha_content = session.get('http://www.zhihu.com/captcha.gif?r=%d&type=login' % unix_time).content
     captcha_text = oncaptcha(captcha_content)
 
+    headers = {
+        'accept': '*/*',
+        'accept-encoding': 'gzip, deflate',
+        'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6,id;q=0.4,ja;q=0.2,ru;q=0.2,zh-TW;q=0.2,fr;q=0.2,es;q=0.2,de;q=0.2,pt;q=0.2',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'referer': 'https://www.zhihu.com/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36'
+    }
+
     data = {
         '_xsrf': _xsrf,
         'password': password,
@@ -31,11 +40,11 @@ def login(username, password, oncaptcha) :
     }
 
     # 登录
-    resp = session.post('https://www.zhihu.com/login/email', data).content
+    resp = session.post('https://www.zhihu.com/login/email', data, headers).content
     print(resp.decode('unicode_escape'))
 
 def main() :
-    login('allotory@msn.com', 'zhseverus1258740', kill_captcha)
+    login('allotory@msn.com', 'xxxxx', kill_captcha)
 
 if __name__ == '__main__' :
     main()
