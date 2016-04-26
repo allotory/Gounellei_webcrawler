@@ -4,6 +4,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 import json
+import re
 
 def kill_captcha(data) :
     with open('captcha.png', 'wb') as f :
@@ -44,42 +45,65 @@ def login(username, password, oncaptcha) :
     resp = session.post('https://www.zhihu.com/login/email', data, headers).content
     print(resp.decode('unicode_escape'))
 
-    # 查询所有关注我的人
-    # data-init="{"params": {"offset": 0, "order_by": "created", "hash_id": "12010d7eaa2aad61931b26e1b17e3caa"}, "nodename": "ProfileFolloweesListV2"}"
-    # 获取 hash_id
-    followees_content = session.get('https://www.zhihu.com/people/elleryzhang/followees').content
-    followees_soup = BeautifulSoup(followees_content, 'html.parser')
-    info_div = followees_soup.find('div', attrs={'class': 'zh-general-list clearfix'})['data-init']
+    return _xsrf, session
 
-    data_dict = json.loads(info_div)
-    hash_id = data_dict['params']['hash_id']
+def get_following_count(session) :
+    resp = session.get('https://www.zhihu.com/question/following').content
+    soup = BeautifulSoup(resp, 'html.parser')
+    following_count = soup.find('span', attrs={'class': 'zg-gray-normal'}).string
+    m = re.match(r'^\（(\d+)\）$', following_count)
+    return m.group(1)
+
+
+def followed_question(_xsrf, session, offset) :
+    # 查询所有我关注的问题
+    # 获取 hash_id
     params = {
-        'offset': 0,
-        'order_by': 'created',
-        'hash': hash_id
+        'offset': offset
     }
-    print(params)
-    followees_data = {
+    following_data = {
         'method': 'next',
         'params': json.dumps(params),
         '_xsrf': _xsrf
     }
-    print(followees_data)
-    followees_headers = {
+    following_headers = {
         'accept': '*/*',
         'accept-encoding': 'gzip, deflate',
         'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6,id;q=0.4,ja;q=0.2,ru;q=0.2,zh-TW;q=0.2,fr;q=0.2,es;q=0.2,de;q=0.2,pt;q=0.2',
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'origin': 'https://www.zhihu.com',
-        'referer': 'https://www.zhihu.com/people/elleryzhang/followees',
+        'referer': 'https://www.zhihu.com/question/following',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36',
         'x-requested-with': 'XMLHttpRequest'
     }
-    resp = session.post('https://www.zhihu.com/node/ProfileFolloweesListV2', data=followees_data, headers=followees_headers)
-    print(resp.content.decode('utf-8'))
+    resp = session.post('https://www.zhihu.com/node/ProfileFollowedQuestionsV2', data=following_data, headers=following_headers)
+    json_data = json.loads(resp.content.decode('utf-8'))
+    
+    return json_data
+
+def parse_html(html) :
+    soup = BeautifulSoup(html, 'html.parser')
+    # vote_num = soup.find('div', attrs={'class': 'zm-profile-vote-num'}).getText()
+    question = soup.find('a', attrs={'class': 'question_link'}).getText()
+    # print(vote_num)
+    print(question)
+
 
 def main() :
-    login('allotory@gmail.com', 'xxxxx', kill_captcha)
+    _xsrf, session = login('allotory@gmail.com', 'xxxxx', kill_captcha)
+    following_count = int(get_following_count(session))
+    offset = 0
+    while offset < following_count :
+        json_data = followed_question(_xsrf, session, offset)
+        counter = 20
+        if following_count - offset < 20 :
+            counter = following_count - offset
+
+        for i in range(counter) :
+            # print(json_data['msg'][i])
+            parse_html(json_data['msg'][i])
+
+        offset += 20
 
 if __name__ == '__main__' :
     main()
