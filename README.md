@@ -1,8 +1,8 @@
-# Gounellei WebCrawler
+# Metallura WebCrawler
 
-## What is Gounellei WebCrawler?
+## What is Metallura WebCrawler?
 
-Gounellei WebCrawler is a simple tool to download images or text content.
+Metallura WebCrawler is a simple tool to download images or text content.
 
 ## Features
 
